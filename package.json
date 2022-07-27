@@ -6,6 +6,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
+    "aws-sdk": "^2.1182.0",
     "bootstrap": "^5.2.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.4.0",
@@ -20,7 +21,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "aws s3 sync build/ s3://spliticist"
+    "deploy": "yarn run build && aws s3 sync build/ s3://spliticist && aws cloudfront create-invalidation --distribution-id E1JLDB3UFZX3TU --path '/*'"
   },
   "eslintConfig": {
     "extends": [
