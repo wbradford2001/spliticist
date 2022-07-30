@@ -18,12 +18,9 @@ const StyledNav = styled(Navbar)`
 
 
 const login_url = 'https://spliticist.auth.us-west-1.amazoncognito.com/login?client_id=16kr7l3gd2uhro89pfnkk77api&response_type=token&scope=email+openid&redirect_uri=https://spliticist.com';
-// const login_url = 'http://localhost:3000?client_id=16kr7l3gd2uhro89pfnkk77api&response_type=token&scope=email+openid&redirect_uri=https://spliticist.com';
-      //  console.log("loggin in!")
-      //  const curUrl = window.location.href;
 
 
-      class NavB extends React.Component{
+class NavB extends React.Component{
         constructor(props){
           super(props)
           this.LoginButton= (<Button style = {{"position": "absolute", "right": "3rem"}} onClick = {this.onclickfunc} href = {login_url}>Login</Button>)    
