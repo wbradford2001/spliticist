@@ -3,7 +3,7 @@ import './App.css';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import NavigationBar from './components/NavigationBar';
 import ContactPage from './pages/Contact';
-import EditPage from './pages/EditSplit'
+import EditPage from './pages/EditPage'
 import HomePage from './pages/HomePage'
 
 

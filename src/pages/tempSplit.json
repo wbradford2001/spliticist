@@ -1,0 +1,23 @@
+[
+
+        {"Name": "Push",
+        "Exercises": [
+                    {"Name":"Bench"}, 
+                    {"Name": "Dips"},
+                    {"Name": "KickBacks"}
+                    ]
+        },
+
+        {"Name": "Pull",
+        "Exercises": [
+            {"Name":"Rows"}, 
+            {"Name": "Curls"}
+            ]
+        },
+
+        {"Name": "Legs",
+        "Exercises": [
+            {"Name":"Squat"}
+            ]
+        }        
+    ]

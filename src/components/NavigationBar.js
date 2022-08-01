@@ -36,7 +36,6 @@ class NavB extends React.Component{
       if (localStorage.getItem("id_token")===null){
         const curUrl = window.location.href;
         if (curUrl.includes("id_token")){
-          console.log("setting local storage")
           const id_token = (curUrl.split("#id_token=")[1]).split("&")[0]
           const access_token = (curUrl.split("#id_token=")[1]).split("&")[1].split("access_token=")[1]
           localStorage.setItem("id_token", id_token)
@@ -44,7 +43,6 @@ class NavB extends React.Component{
         } 
       } 
     if (localStorage.getItem("id_token")===null){
-      console.log("setting login button")
       this.setState({activeButton: this.LoginButton})
     } else {
       console.log("setting logout button")
