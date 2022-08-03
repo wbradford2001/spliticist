@@ -45,14 +45,14 @@ class NavB extends React.Component{
     if (localStorage.getItem("id_token")===null){
       this.setState({activeButton: this.LoginButton})
     } else {
-      console.log("setting logout button")
+
       this.setState({activeButton: this.LogoutButton})
     }
     }
 
     onclickfunc(){
       localStorage.clear()
-      console.log(this.state.activeButton)
+
       if (this.state.activeButton==this.LoginButton){
         this.setState({activeButton: this.LogoutButton})
       } else {

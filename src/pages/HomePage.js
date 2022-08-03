@@ -2,15 +2,42 @@ import React from 'react';
 import styled from 'styled-components';
 import Day from '../components/Day';
 import AWS from 'aws-sdk'
+import {Alert, Button} from 'react-bootstrap'
+
+
 
 const StyledHomePage = styled.div`
   color: black
+  
 `;
 
-AWS.config.region = 'us-west-1';
+const Title = styled(Alert)`
+font-size: 2rem;
+width: 100%;
+opacity: 0.7;
 
-const f_id_token = 'eyJraWQiOiJNRGRoSlgrdmo5dlRYNklBXC9sc2o3ekFFVGdUNktQaFpaUkF2RW5xZmwyRT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoibFg2Q09DckhjXzBHSHVIZXpYeVgydyIsInN1YiI6Ijg1MTA5NjBkLTcyMzctNGI2OS05YzVhLTg4ZjQwZjAzYWQwYiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtd2VzdC0xLmFtYXpvbmF3cy5jb21cL3VzLXdlc3QtMV9qcmZqT1RaZmciLCJjb2duaXRvOnVzZXJuYW1lIjoiODUxMDk2MGQtNzIzNy00YjY5LTljNWEtODhmNDBmMDNhZDBiIiwiYXVkIjoiMTZrcjdsM2dkMnVocm84OXBmbmtrNzdhcGkiLCJldmVudF9pZCI6IjQ0OTRkYzgwLTQzM2UtNGNkYi04YjA4LThkODJiN2RlZTExNCIsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNjU5Mzc5OTM3LCJleHAiOjE2NTkzODM1MzcsImlhdCI6MTY1OTM3OTkzNywianRpIjoiODNmMmY5MjAtOTVlYy00M2Q3LWJmYzUtMWY2OTVmZjY5YTlkIiwiZW1haWwiOiJ3YnJhZGZvcmQyMDAxQGdtYWlsLmNvbSJ9.S9RkXkrOITmvkiAUhjnQAVfpyQ9Y1OB5lszMLHPX-G9Mj9TLNfcnV1dJRR53quQ-RxXEz7C8qt_buNy3hzcjE_f46vgi4QjYMYMZ7RImj5MVpV44QQNFmAYbPnCUb1F9mnO5RnKeJ79LTaiyLrCYbrCRIMM_l1BSFMDcmIdPEXuy-fyOXF34xXISrgbuj4nQziEakYD1TrgiTbf7RWSaWYjN_-Ng2TKmiYfRwmtBMccx6-58X4kXf8NYLP_FiQxvLqen4BbuFXVCr1p8DoQRc3BSKRfUBBchZ7BmCf3cTPPBUKbfC3DGwuIps1mrZBjc7aPYSDBXyJETRBjMnXE4hg'
-const f_email = 'wbradford2001@gmail.com'
+position: sticky;
+top: 8%;
+z-index: 1;
+margin-left: 3rem;
+`
+const ButtonContainer = styled.div`
+width: 100%;
+height: 70vh;
+margin: 0;
+display: flex;
+justify-content: center;
+align-items: center;
+
+`
+const StyledButton = styled(Button)`
+
+`
+
+AWS.config.region = 'us-west-1';
+const login_url = 'https://spliticist.auth.us-west-1.amazoncognito.com/login?client_id=16kr7l3gd2uhro89pfnkk77api&response_type=token&scope=email+openid&redirect_uri=https://spliticist.com';
+
+
 function getSplit(email, lambdaObj, Obj){
     const params = {
         FunctionName: 'arn:aws:lambda:us-west-1:649237903886:function:spliticistBackend', /* required */
@@ -20,11 +47,21 @@ function getSplit(email, lambdaObj, Obj){
     
       };    
     lambdaObj.invoke(params, function(err, data) {
-    if (err) console.log(err, err.stack); // an error occurred
+    if (err) {
+        console.log(err)
+        console.log(err.stack)
+
+        if (err.stack.includes('CredentialsError')){
+            localStorage.clear()
+
+            window.location.replace(login_url)
+
+        }
+    } 
     else     {
         let Split=[]
         const TempSplit = JSON.parse(JSON.parse(data["Payload"])["body"])
-        console.log(TempSplit)
+
         for (let day of TempSplit){
             console.log(day)
             const exercises = day["M"]["Exercises"]["L"].map((dict, index)=>{
@@ -32,7 +69,7 @@ function getSplit(email, lambdaObj, Obj){
             })
             Split.push({"Name": day["M"]["Name"]["S"], "Exercises": exercises})
         }
-        console.log(Split)
+
         Obj.setState({split: Split}); 
 
         localStorage.setItem("Split", JSON.stringify(Split))        
@@ -53,7 +90,8 @@ class HomePage extends React.Component{
     componentDidMount(){
 
         
-        
+        //delete me
+        // localStorage.setItem("id_token", 'eyJraWQiOiJNRGRoSlgrdmo5dlRYNklBXC9sc2o3ekFFVGdUNktQaFpaUkF2RW5xZmwyRT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoib21aSjUyRm5sVUVuMmxLTXVoLWJldyIsInN1YiI6IjBjMGFjMTA4LTIwNzUtNDFjYi1iOTYxLWE4YTZiZTcxOTRiOCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtd2VzdC0xLmFtYXpvbmF3cy5jb21cL3VzLXdlc3QtMV9qcmZqT1RaZmciLCJjb2duaXRvOnVzZXJuYW1lIjoiMGMwYWMxMDgtMjA3NS00MWNiLWI5NjEtYThhNmJlNzE5NGI4IiwiYXVkIjoiMTZrcjdsM2dkMnVocm84OXBmbmtrNzdhcGkiLCJldmVudF9pZCI6ImEwMmYwYzMyLWU1OGEtNDkwMy05ZGJlLWIwODEwYzRhMGJjMyIsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNjU5Mzk4NDc2LCJleHAiOjE2NTk0MDIwNzYsImlhdCI6MTY1OTM5ODQ3NiwianRpIjoiZjdlMDhmNDItMzIxYi00MjlmLTk3MjctMGZlMmUxMTFjYzk4IiwiZW1haWwiOiJ3YnJhZGZvcmQyMDAxQGdtYWlsLmNvbSJ9.kJAGfyvqxTyQGyzy2WPToCjWCa8q3LFy2herD03uLbs6xq4nR1uoi-udU7P8GUSB_RkUSS0TaQ5418hNzbP2S6YMcwjO8fPNNqUrR3aeBwf3DwILi-WyXJZJadRs1FzdDySbcKk2dTP35sjPiziQr6YvWtfdPd6mZBm3HJAvG6hUdrPF2acz2ZfkO446CjeGVl9WqIzpjX1tQf_ood8LtJWosgFIG8Au6_Ovp2FEHxedNBFuQw7JDFz1dV43yYiEbud1mJRSi7OUHZUC8MOeC6sPGzuHHvgOH4bjy9usa0bKDA0Wmkdp-TVmJMwVCUcXIf9j4GMj0iV-NRIL2_0dCw')
         
         if (localStorage.getItem("id_token")===null){
             this.setState({loggedIn: false})
@@ -102,21 +140,25 @@ class HomePage extends React.Component{
                 </StyledHomePage>)
         } else {
             const JSONSplit = this.state.split
-            console.log(typeof(JSONSplit))
-                    
+
+            let dayDisplays = []
+            let i=0
+            for (let day of JSONSplit){
+                if (day){
+                    dayDisplays.push(<Day key={i} title = {day["Name"]} exercises={day["Exercises"]}></Day>)
+                    i++
+                }
+            } 
+            if (dayDisplays.length == 0){
+                dayDisplays = (<ButtonContainer><StyledButton href="/Edit" variant="success">Create Split</StyledButton></ButtonContainer>)
+            }
             return(<StyledHomePage key="keyhere">
-                <div>
-                    Welcom, {this.state.email}
-                </div>
-                <div>
-                Your Split
-                </div>
+                <Title variant="light">
+                    Welcome, {this.state.email.split('@')[0]}!
+                </Title>
                 <div>
                     
-                    {JSONSplit.map((day,index)=>{
-                        // return(<div>{Day["Name"]}</div>)
-                        return(<Day key={index} title = {day["Name"]} exercises={day["Exercises"]}></Day>)
-                    })}
+                    {dayDisplays}
                 </div>
                 </StyledHomePage>)
         }

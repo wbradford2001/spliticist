@@ -2,14 +2,31 @@ import React from 'react';
 import styled from 'styled-components';
 import AWS from 'aws-sdk'
 import DayInput from '../components/DayInput';
-import { isLabelWithInternallyDisabledControl } from '@testing-library/user-event/dist/utils';
+import {Alert,Modal,Button } from 'react-bootstrap'
+import CustomSpinner from '../components/CustomSpinner'
 
 // const data = require('./tempSplit.json')
 const login_url = 'https://spliticist.auth.us-west-1.amazoncognito.com/login?client_id=16kr7l3gd2uhro89pfnkk77api&response_type=token&scope=email+openid&redirect_uri=https://spliticist.com';
 
+const StyledEditPage = styled.div`
+`
 
-function postSplit(email, split, lambdaObj){
-    console.log(split)
+const StyledAb = styled.div`
+font-size: 60px;
+width: 100%;
+display: flex;
+justify-content: center;
+`
+
+const SaveChanges = styled(Alert)`
+position: sticky;
+bottom: 0;
+opacity: 0.7;
+margin: 0;
+`
+
+function postSplit(email, split, lambdaObj, obj){
+    obj.setState({popup: 'loading'})
     const packagedSplit = []
     for (let Day of split){
       if (Day){
@@ -28,7 +45,6 @@ function postSplit(email, split, lambdaObj){
               "Exercises": {"L": exercises}
             }
         }
-        console.log(newDict)
         packagedSplit.push(newDict)
 
       }
@@ -44,10 +60,25 @@ function postSplit(email, split, lambdaObj){
         
     
     lambdaObj.invoke(params, function(err, data) {
-    if (err) console.log(err, err.stack); // an error occurred
+    if (err) {
+      console.log(err, err.stack);
+      obj.setState({popup: 'error'})
+      if (err.stack.includes('CredentialsError')){
+        localStorage.clear()
+        window.location.replace(login_url)
+
+    }
+
+    } // an error occurred
     else     {
         console.log(data["Payload"])
-        localStorage.setItem("Split", split)
+        if (data["Payload"].includes('errorMessage')){
+          obj.setState({popup: 'error'})
+        } else {
+
+          obj.setState({popup: 'success'})
+          localStorage.setItem("Split", JSON.stringify(split))
+        }
 
               }          // successful response
   });
@@ -56,7 +87,9 @@ class EditPage extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        JSONSplit: []
+        JSONSplit: [],
+        popup: null,
+        showSpinner: "false"
     };
     this.saveChanges = this.saveChanges.bind(this)
     this.handleTitleChange = this.handleTitleChange.bind(this)
@@ -65,25 +98,33 @@ class EditPage extends React.Component {
     this.deleteDay = this.deleteDay.bind(this)
     this.deleteExercise = this.deleteExercise.bind(this)
     this.addExercise = this.addExercise.bind(this)
+    this.mouseEnterAdd = this.mouseEnterAdd.bind(this)
+    this.mouseLeaveAdd = this.mouseLeaveAdd.bind(this)
+    this.returnModal = this.returnModal.bind(this)
+    this.hideModal=this.hideModal.bind(this)
     }
     componentDidMount(){
     //     if (localStorage.getItem("Split")!==null){
     //       this.setState({Split: localStorage.getItem("Split")})
     //     }
     // }
+
+            // localStorage.setItem("Split",'[{"Name":"Push","Exercises":[{"Name":"Bench"},{"Name":"Incline Bench"},{"Name":"Decline Bench"}]},{"Name":"Pull","Exercises":[{"Name":"Pull-ups"},{"Name":"Curls"},{"Name":"Rows"}]},{"Name":"Legs","Exercises":[{"Name":"Squat"}]}]')
+            // localStorage.setItem("id_token",'eyJraWQiOiJNRGRoSlgrdmo5dlRYNklBXC9sc2o3ekFFVGdUNktQaFpaUkF2RW5xZmwyRT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoia21oTFJPNW9kNTdCZzEtVHRYMFBvdyIsInN1YiI6IjBjMGFjMTA4LTIwNzUtNDFjYi1iOTYxLWE4YTZiZTcxOTRiOCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtd2VzdC0xLmFtYXpvbmF3cy5jb21cL3VzLXdlc3QtMV9qcmZqT1RaZmciLCJjb2duaXRvOnVzZXJuYW1lIjoiMGMwYWMxMDgtMjA3NS00MWNiLWI5NjEtYThhNmJlNzE5NGI4IiwiYXVkIjoiMTZrcjdsM2dkMnVocm84OXBmbmtrNzdhcGkiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTY1OTU2MDE5NCwiZXhwIjoxNjU5NTYzNzk0LCJpYXQiOjE2NTk1NjAxOTQsImp0aSI6IjQ5OTBiNGI5LWUyYTEtNDkwNi1hZDgwLTNkODEzYmYyOGQxYSIsImVtYWlsIjoid2JyYWRmb3JkMjAwMUBnbWFpbC5jb20ifQ.h88D4D6ypfS5rRWDby8nKiuNy5Jx9wKXiU-Q3C8JGO6EojrE0InWFy6-1Sm86iDxZnWx5G7yJBIsD4p_n5lDKLsELzeyPk0_vWwjnI4zkBukw39YKa7i9aGNWD1oYnbhfUo2B6FUEaKJ71fU0hGINQ4tNe_H_qXsdZpretlDDCqp7Rj8_2vTqUmaKQq76e1xV58w9xTqvAQHftWjLuC7cD8HVLqm_zOd3crG9I6VmOogH583ju-R4cgFfHDxRjZOCc4DFCfWPxde0v7_riXuCMb91mpYo85YrkszB-IOa4G0SZI27iR-4FMhcrDVA-u3mwKnI6ZRTRmaJkdAZT3XSw')
             if (localStorage.getItem("Split")!==null){
                   const stringySplit = localStorage.getItem("Split")
                   const JSONState = (JSON.parse(stringySplit))
                   this.setState({JSONSplit: JSONState})
                   const id_token = localStorage.getItem("id_token")
                 
-                      
+
                       
                   // const access_token = localStorage.getItem("access_token")
                   AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                       IdentityPoolId: 'us-west-1:3e1e5c4a-c1ae-44e0-a72b-c4ec1b3a791c',
                       Logins: {
-                          'cognito-idp.us-west-1.amazonaws.com/us-west-1_jrfjOTZfg': id_token
+                          'cognito-idp.us-west-1.amazonaws.com/us-west-1_jrfjOTZfg':id_token
+
                       }                
                   }); 
               }
@@ -94,7 +135,7 @@ class EditPage extends React.Component {
         const email = localStorage.getItem("email")
   
         const lambdaObj = new AWS.Lambda({apiVersion: '2015-03-31'});     
-        postSplit(email, this.state.JSONSplit, lambdaObj)
+        postSplit(email, this.state.JSONSplit, lambdaObj, this)
       } else {
         window.location.replace(login_url);
       }
@@ -129,9 +170,9 @@ class EditPage extends React.Component {
     }
     deleteExercise(day, exerciseNumber){
       let oldSplit = this.state.JSONSplit
-      console.log(oldSplit[day]["Exercises"][exerciseNumber])
+      
       oldSplit[day]["Exercises"][exerciseNumber] = null
-      console.log(oldSplit[day]["Exercises"][exerciseNumber])
+     
       delete oldSplit[day]["Exercises"][exerciseNumber]
       this.setState({JSONSplit: oldSplit})
     }
@@ -141,13 +182,58 @@ class EditPage extends React.Component {
       oldSplit[day]["Exercises"].push({"Name":""})
       this.setState({JSONSplit: oldSplit})      
     }
+    mouseEnterAdd(event){
+      document.body.style.cursor = 'pointer'
+
+  }
+  mouseLeaveAdd(event){
+      document.body.style.cursor = 'auto'
+
+  }       
+  hideModal(){
+    this.setState({popup: null})
+  }
+  returnModal(title, body, variant){
+    return(
+    <Modal show={this.state.popup !==null} onHide={this.hideModal}>
+    <Modal.Header closeButton>
+        <Modal.Title>{title}</Modal.Title>
+        <CustomSpinner animation="border" role="status" show ={(title==="Loading")}></CustomSpinner>
+    </Modal.Header>
+    <Modal.Body>
+        <Alert variant = {variant}>
+            {body}
+        </Alert>
+    </Modal.Body>
+    <Modal.Footer>
+    <Button variant="secondary" onClick={this.hideModal}>
+        Ok
+    </Button>
+
+    </Modal.Footer>
+  </Modal>)
+  }
     render() {
 
       const state = this.state.JSONSplit
-
+      let MODAL=(<div></div>)
+      if (this.state.popup==='loading'){
+         MODAL = this.returnModal("Loading","One moment please","secondary")
+      } else if (this.state.popup === 'success'){
+         MODAL = this.returnModal("Success","Enjoy your new Split!","success")
+      } else if (this.state.popup === 'error'){
+         MODAL = this.returnModal("Oops, an error occured!","Please try again later!","danger")
+      } 
 
       return (
-        <div>
+        <StyledEditPage>
+
+
+            {MODAL}
+
+
+
+
               {state.map((day, index)=>{
                 const name=day["Name"]
                 return(<DayInput 
@@ -161,10 +247,12 @@ class EditPage extends React.Component {
                   deleteExercise = {this.deleteExercise}
                   addExercise = {this.addExercise}
                   ></DayInput>)
-              })}   
-              <button onClick={this.addDay}>+</button>
-              <button onClick={this.saveChanges}>Save Changes</button>       
-        </div>
+              })}  
+
+              <StyledAb onClick={this.addDay} onMouseEnter={this.mouseEnterAdd} onMouseLeave={this.mouseLeaveAdd}  className="material-symbols-outlined">add_box</StyledAb>
+ 
+              <SaveChanges variation = "primary" onClick={this.saveChanges}>Save Changes</SaveChanges>   
+        </StyledEditPage>
       );
     }
   }

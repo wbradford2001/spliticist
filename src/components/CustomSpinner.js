@@ -13,7 +13,7 @@ class CustomSpinner extends React.Component{
         
     }
     render(){
-        if (this.props.show === 'false'){
+        if (this.props.show === false){
 
             return (<div></div>)
         }
