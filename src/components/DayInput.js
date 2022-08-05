@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import React from 'react'
 import Exercise from '../components/Exercise'
-import {Form} from 'react-bootstrap'
+import {Form, Overlay, Popover} from 'react-bootstrap'
 import styled from 'styled-components'
 
 
@@ -10,6 +10,8 @@ border: 1px solid grey;
 border-radius: 1rem;
 padding: 2rem;
 margin: 1rem;
+background-color: rgb(150, 150,150);
+width: 70%;
 `
 const StyledHeader=styled.div`
 display: flex;
@@ -26,23 +28,27 @@ align-items: center;
 
 const StyledAb = styled.div`
 margin: 1rem;
-
+color: green;
 font-size: 30px;
+
 `
 
 
 const StyledTrash = styled.div`
-
+color: red;
 display: flex;
 align-items: center;
 `
 
+const StyledPopover = styled(Popover)`
 
+`
 class DayInput extends React.Component{
     constructor(props){
         super(props)
         this.state = {
-            title: this.props.title
+            title: this.props.title,
+            showOverlay: false
         }
         this.handleTitleChange = this.handleTitleChange.bind(this)
         this.handleExerciseChange = this.handleExerciseChange.bind(this)
@@ -51,6 +57,22 @@ class DayInput extends React.Component{
         this.addExercise = this.addExercise.bind(this)
         this.mouseEnterTrash = this.mouseEnterTrash.bind(this)
         this.mouseLeaveTrash = this.mouseLeaveTrash.bind(this)
+
+
+
+        this.addExRef = React.createRef();
+    }
+    componentDidMount(){
+
+        
+        if (this.props.first==true){
+
+            this.setState({showOverlay: true})
+        }
+
+        
+
+        
     }
     handleTitleChange(event){
         this.setState({title: event.target.value})
@@ -68,6 +90,7 @@ class DayInput extends React.Component{
     addExercise(event){
         event.preventDefault();
         this.props.addExercise(this.props.day)
+        this.setState({showOverlay: false})
     }
     mouseEnterTrash(event){
         document.body.style.cursor = 'pointer'
@@ -104,7 +127,20 @@ class DayInput extends React.Component{
                              ></Exercise>)
                     })}
 
-                        <StyledAb onClick={this.addExercise} onMouseEnter={this.mouseEnterTrash} onMouseLeave={this.mouseLeaveTrash}  className="material-symbols-outlined">add_box</StyledAb>
+                        <StyledAb ref = {this.addExRef}onClick={this.addExercise} onMouseEnter={this.mouseEnterTrash} onMouseLeave={this.mouseLeaveTrash}  className="material-symbols-outlined">add_box</StyledAb>
+                        <Overlay 
+                            show={this.state.showOverlay}
+                            target={this.addExRef.current}
+                            placement="bottom"
+                            
+
+                            >
+                            <StyledPopover id="popover-contained">
+                                <Popover.Body >
+                                <strong>New Exercise</strong>
+                                </Popover.Body>
+                            </StyledPopover>
+                        </Overlay>
                 </StyledBody>
             </StyledForm>
         )

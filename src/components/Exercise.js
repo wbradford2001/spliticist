@@ -8,7 +8,7 @@ display: flex;
 `
 
 const StyledTrash = styled.div`
-
+color: red;
 display: flex;
 align-items: center;
 `

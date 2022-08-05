@@ -1,5 +1,4 @@
 import React from "react";
-import  FloatingLabel  from "react-bootstrap/FloatingLabel";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -22,11 +21,14 @@ function sendEm(obj, message){
     };        
     publishTextPromise.publish(params).promise().then(
         function(data) {
-            obj.showModal(false)
+            obj.showModal(false);
+            obj.setState({showSpinner: false})   
     }).catch(
             function(err) {
-                obj.state.modalText = "Oops, an error occured, please try again later!"
-                obj.showModal(true)                    
+
+                obj.setState({modalText: "Oops, an error occured, please try again later!"})
+                obj.showModal(true)  
+                obj.setState({showSpinner: false})                  
                 console.error(err, err.stack);
     });
 }
@@ -122,15 +124,17 @@ class ContactPage extends React.Component{
     sendEmail(event){
         event.preventDefault();
 
-
-        this.state.modalText = this.validateForm()
+        const temp = this.validateForm()
+        this.state.modalText= temp
         if (this.state.modalText === "success"){
             this.showModal("load")
             this.sendPost();
             
             
         } else {
+            this.setState({showSpinner: false})
             this.showModal(true)
+
         }
     }
     emailChange(event){

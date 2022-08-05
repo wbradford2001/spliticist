@@ -2,29 +2,46 @@ import React from 'react';
 import styled from 'styled-components';
 import AWS from 'aws-sdk'
 import DayInput from '../components/DayInput';
-import {Alert,Modal,Button } from 'react-bootstrap'
+import {Alert,Modal,Button, Popover, Overlay } from 'react-bootstrap'
 import CustomSpinner from '../components/CustomSpinner'
+
 
 // const data = require('./tempSplit.json')
 const login_url = 'https://spliticist.auth.us-west-1.amazoncognito.com/login?client_id=16kr7l3gd2uhro89pfnkk77api&response_type=token&scope=email+openid&redirect_uri=https://spliticist.com';
 
 const StyledEditPage = styled.div`
+display: flex;
+flex-flow: column;
+align-items: center
 `
 
 const StyledAb = styled.div`
 font-size: 60px;
-width: 100%;
+color: grey;
+margin-top: 3rem;
+
+margin-left: auto;
+margin-right: auto;
+
+`
+
+const SaveChanges = styled(Button)`
+
+width: 40vw;
 display: flex;
 justify-content: center;
-`
-
-const SaveChanges = styled(Alert)`
-position: sticky;
-bottom: 0;
+scroll: none;
 opacity: 0.7;
-margin: 0;
+margin: 0rem;
+margin-top: 5rem;
 `
+const StyledOverlay = styled(Overlay)`
+margin: 0
+`
+const StyledPopover = styled(Popover)`
+margin: 0;
 
+`
 function postSplit(email, split, lambdaObj, obj){
     obj.setState({popup: 'loading'})
     const packagedSplit = []
@@ -89,7 +106,8 @@ class EditPage extends React.Component {
       this.state = {
         JSONSplit: [],
         popup: null,
-        showSpinner: "false"
+        showSpinner: "false",
+        showOverlay: false
     };
     this.saveChanges = this.saveChanges.bind(this)
     this.handleTitleChange = this.handleTitleChange.bind(this)
@@ -102,8 +120,12 @@ class EditPage extends React.Component {
     this.mouseLeaveAdd = this.mouseLeaveAdd.bind(this)
     this.returnModal = this.returnModal.bind(this)
     this.hideModal=this.hideModal.bind(this)
+
+
+    this.addDayRef = React.createRef();
     }
     componentDidMount(){
+      
     //     if (localStorage.getItem("Split")!==null){
     //       this.setState({Split: localStorage.getItem("Split")})
     //     }
@@ -111,6 +133,12 @@ class EditPage extends React.Component {
 
             // localStorage.setItem("Split",'[{"Name":"Push","Exercises":[{"Name":"Bench"},{"Name":"Incline Bench"},{"Name":"Decline Bench"}]},{"Name":"Pull","Exercises":[{"Name":"Pull-ups"},{"Name":"Curls"},{"Name":"Rows"}]},{"Name":"Legs","Exercises":[{"Name":"Squat"}]}]')
             // localStorage.setItem("id_token",'eyJraWQiOiJNRGRoSlgrdmo5dlRYNklBXC9sc2o3ekFFVGdUNktQaFpaUkF2RW5xZmwyRT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoia21oTFJPNW9kNTdCZzEtVHRYMFBvdyIsInN1YiI6IjBjMGFjMTA4LTIwNzUtNDFjYi1iOTYxLWE4YTZiZTcxOTRiOCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtd2VzdC0xLmFtYXpvbmF3cy5jb21cL3VzLXdlc3QtMV9qcmZqT1RaZmciLCJjb2duaXRvOnVzZXJuYW1lIjoiMGMwYWMxMDgtMjA3NS00MWNiLWI5NjEtYThhNmJlNzE5NGI4IiwiYXVkIjoiMTZrcjdsM2dkMnVocm84OXBmbmtrNzdhcGkiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTY1OTU2MDE5NCwiZXhwIjoxNjU5NTYzNzk0LCJpYXQiOjE2NTk1NjAxOTQsImp0aSI6IjQ5OTBiNGI5LWUyYTEtNDkwNi1hZDgwLTNkODEzYmYyOGQxYSIsImVtYWlsIjoid2JyYWRmb3JkMjAwMUBnbWFpbC5jb20ifQ.h88D4D6ypfS5rRWDby8nKiuNy5Jx9wKXiU-Q3C8JGO6EojrE0InWFy6-1Sm86iDxZnWx5G7yJBIsD4p_n5lDKLsELzeyPk0_vWwjnI4zkBukw39YKa7i9aGNWD1oYnbhfUo2B6FUEaKJ71fU0hGINQ4tNe_H_qXsdZpretlDDCqp7Rj8_2vTqUmaKQq76e1xV58w9xTqvAQHftWjLuC7cD8HVLqm_zOd3crG9I6VmOogH583ju-R4cgFfHDxRjZOCc4DFCfWPxde0v7_riXuCMb91mpYo85YrkszB-IOa4G0SZI27iR-4FMhcrDVA-u3mwKnI6ZRTRmaJkdAZT3XSw')
+            const testerFunc = (elem)=> (elem==undefined)
+
+            if (this.state.JSONSplit.every(testerFunc)){
+              this.setState({showOverlay: true})
+              console.log("display overlay")
+            }            
             if (localStorage.getItem("Split")!==null){
                   const stringySplit = localStorage.getItem("Split")
                   const JSONState = (JSON.parse(stringySplit))
@@ -145,7 +173,6 @@ class EditPage extends React.Component {
       let oldSplit = this.state.JSONSplit
       oldSplit[day]["Name"] = newTitle
       this.setState({JSONSplit: oldSplit})
-      console.log(this.state.JSONSplit)
 
     }
     handleExerciseChange(day, exerciseNumber, newVal){
@@ -159,13 +186,17 @@ class EditPage extends React.Component {
       "Exercises": [
       ]
       })
-      this.setState({JSONSplit: oldSplit})
+      this.setState({JSONSplit: oldSplit,showOverlay: false})
+
+           
     }
     deleteDay(day){
       let oldSplit = this.state.JSONSplit
       
       delete oldSplit[day]
       this.setState({JSONSplit: oldSplit})
+
+
 
     }
     deleteExercise(day, exerciseNumber){
@@ -179,7 +210,7 @@ class EditPage extends React.Component {
 
     addExercise(day){
       let oldSplit = this.state.JSONSplit
-      oldSplit[day]["Exercises"].push({"Name":""})
+      oldSplit[day]["Exercises"].push({"Name":"New Exercise"})
       this.setState({JSONSplit: oldSplit})      
     }
     mouseEnterAdd(event){
@@ -216,6 +247,7 @@ class EditPage extends React.Component {
     render() {
 
       const state = this.state.JSONSplit
+
       let MODAL=(<div></div>)
       if (this.state.popup==='loading'){
          MODAL = this.returnModal("Loading","One moment please","secondary")
@@ -224,6 +256,7 @@ class EditPage extends React.Component {
       } else if (this.state.popup === 'error'){
          MODAL = this.returnModal("Oops, an error occured!","Please try again later!","danger")
       } 
+
 
       return (
         <StyledEditPage>
@@ -246,11 +279,24 @@ class EditPage extends React.Component {
                   exercises={day["Exercises"]}
                   deleteExercise = {this.deleteExercise}
                   addExercise = {this.addExercise}
+                  first={index==0}
                   ></DayInput>)
               })}  
 
-              <StyledAb onClick={this.addDay} onMouseEnter={this.mouseEnterAdd} onMouseLeave={this.mouseLeaveAdd}  className="material-symbols-outlined">add_box</StyledAb>
- 
+              <StyledAb ref={this.addDayRef}onClick={this.addDay} onMouseEnter={this.mouseEnterAdd} onMouseLeave={this.mouseLeaveAdd}  className="material-symbols-outlined">add_box</StyledAb>
+                <StyledOverlay 
+                  show={this.state.showOverlay}
+                  target={this.addDayRef.current}
+                  placement="bottom"
+                 
+
+                >
+                  <StyledPopover id="popover-contained">
+                    <Popover.Body >
+                      <strong>Click here to create a new Day</strong>
+                    </Popover.Body>
+                  </StyledPopover>
+                </StyledOverlay>
               <SaveChanges variation = "primary" onClick={this.saveChanges}>Save Changes</SaveChanges>   
         </StyledEditPage>
       );

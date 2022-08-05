@@ -3,6 +3,10 @@ import styled from 'styled-components';
 import Day from '../components/Day';
 import AWS from 'aws-sdk'
 import {Alert, Button} from 'react-bootstrap'
+import Carousel from 'react-bootstrap/Carousel';
+import LeftBackground from '../images/spliticist_dumbell.jpeg'
+import RightBackground from '../images/spliticist_pic2.webp'
+
 
 
 
@@ -33,7 +37,84 @@ align-items: center;
 const StyledButton = styled(Button)`
 
 `
+const CustomCarousel = styled(Carousel)`
+border: 1px solid black;
+`
+const StyledImg = styled.img`
+width: 100vw;
+height: 100vh;
+object-fit: cover;
+filter: brightness(40%)
+`
 
+const BulletPoints = styled.div`
+margin: 3rem;
+color: white;
+display: flex;
+justify-content: left;
+flex-flow: column;
+font-size: 3rem;
+`
+
+const CustomeCheckMark = styled.span`
+color: green;
+font-size: 3rem;
+margin: 2rem;
+`
+
+
+
+
+
+
+
+const BottomDiv = styled.div`
+display: flex;
+`
+const LeftBackDivStyle = {
+    backgroundImage: `url("${LeftBackground}")`,
+    height: '50vh',
+    width: '50vw',
+    backgroundSize: 'cover',
+    opacity: '0.5',
+    position: 'absolute',
+    left: '0',
+    zIndex: '1'
+}
+const LeftFrontDivStyle ={
+    zIndex: '2',
+    position: 'absolute',
+    height: '50vh',
+    left: '0',
+    width: '50vw',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+}
+const RightBackDivStyle = {
+    backgroundImage: `url("${RightBackground}")`,
+    height: '50vh',
+    width: '50vw',
+    backgroundSize: 'cover',
+    opacity: '0.3',    
+    position: 'absolute',
+    zIndex: '1',
+    right: '0',
+}
+const RightFrontDivStyle ={
+    zIndex: '2',
+    position: 'absolute',
+    height: '50vh',
+    width: '50vw',
+    right: '0',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+}
+
+const BottomButton = styled(Button)`
+
+`
 AWS.config.region = 'us-west-1';
 const login_url = 'https://spliticist.auth.us-west-1.amazoncognito.com/login?client_id=16kr7l3gd2uhro89pfnkk77api&response_type=token&scope=email+openid&redirect_uri=https://spliticist.com';
 
@@ -131,12 +212,87 @@ class HomePage extends React.Component{
     }
    
     render(){
+        
         if (this.state.loggedIn === false){
-            
+            const Bullets = ["Create", "Update", "Delete", "Any Time", "Any Place"]
 
             return(<StyledHomePage>
                
-                You have NOT logged in
+                <div>
+                    <CustomCarousel>
+                        <Carousel.Item>
+                            <StyledImg
+                            className="d-block w-100"
+                            src={require('../images/sweat.jpeg')}
+                            alt="First slide"
+                            />
+                            <Carousel.Caption>
+                            <h3>Spliticist</h3>
+                            <p>The easiest way to track your workout splits.</p>
+                            </Carousel.Caption>
+                        </Carousel.Item>
+                        <Carousel.Item>
+                            <StyledImg
+                            className="d-block w-100"
+                            src={require('../images/spliticist5.jpeg')}
+                            alt="Second slide"
+                            />
+
+                            <Carousel.Caption>
+                            <h3>Super Convenient</h3>
+                            <p>Easy Create and update workoutes</p>
+                            </Carousel.Caption>
+                        </Carousel.Item>
+                        <Carousel.Item>
+                            <StyledImg
+                            className="d-block w-100"
+                            src={require('../images/spliticist_pic_1.webp')}
+                            alt="Third slide"
+                            />
+
+                            <Carousel.Caption>
+                            <h3>At your fingertips</h3>
+                            <p>
+                                Any time, any place.
+                            </p>
+                            </Carousel.Caption>
+                        </Carousel.Item>
+                    </CustomCarousel>
+
+                </div>
+
+                <BulletPoints>
+                
+                {Bullets.map((bullet, index)=>{
+                    return(
+                    <div key={index}>
+                        <CustomeCheckMark className="material-symbols-outlined">
+                            done_outline
+                        </CustomeCheckMark>
+                        {bullet}
+                    </div>)
+                })}
+                </BulletPoints>
+
+
+
+
+                <BottomDiv>
+
+                    <div style={LeftBackDivStyle}>
+                    </div>
+                    <div style={LeftFrontDivStyle}>
+                            <BottomButton  href = {login_url}>Login</BottomButton>
+                    </div>                
+
+                    <div style={RightBackDivStyle}>
+                    </div>
+                    <div style={RightFrontDivStyle}>
+                            <BottomButton  href = {'Edit'}>Create Split</BottomButton>
+                    </div>
+                </BottomDiv>
+               
+                
                 </StyledHomePage>)
         } else {
             const JSONSplit = this.state.split
