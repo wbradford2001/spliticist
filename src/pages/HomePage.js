@@ -11,20 +11,33 @@ import RightBackground from '../images/spliticist_pic2.webp'
 
 
 const StyledHomePage = styled.div`
-  color: black
+  color: black;
+
   
 `;
 
 const Title = styled(Alert)`
 font-size: 2rem;
-width: 100%;
-opacity: 0.7;
+width: 80%;
 
+opacity: 0.7;
+display: flex;
+align-items: center;
 position: sticky;
 top: 8%;
 z-index: 1;
-margin-left: 3rem;
+margin-left: auto;
+margin-right: auto;
 `
+
+const DayContainer = styled.div`
+display: flex;
+justify-content: center;
+width: 100vw;
+flex-wrap: wrap;
+`
+
+
 const ButtonContainer = styled.div`
 width: 100%;
 height: 70vh;
@@ -47,6 +60,7 @@ object-fit: cover;
 filter: brightness(40%)
 `
 
+const MINWIDTH = 600
 const BulletPoints = styled.div`
 margin: 3rem;
 color: white;
@@ -54,12 +68,20 @@ display: flex;
 justify-content: left;
 flex-flow: column;
 font-size: 3rem;
+
+@media screen and (max-width: ${MINWIDTH}px){
+    font-size: 2rem;
+    }
 `
 
 const CustomeCheckMark = styled.span`
 color: green;
 font-size: 3rem;
 margin: 2rem;
+@media screen and (max-width: ${MINWIDTH}px){
+    margin: 1rem;
+    margin-left: 0rem;
+    }
 `
 
 
@@ -69,48 +91,69 @@ margin: 2rem;
 
 
 const BottomDiv = styled.div`
-display: flex;
+
 `
-const LeftBackDivStyle = {
-    backgroundImage: `url("${LeftBackground}")`,
-    height: '50vh',
-    width: '50vw',
-    backgroundSize: 'cover',
-    opacity: '0.5',
-    position: 'absolute',
-    left: '0',
-    zIndex: '1'
-}
-const LeftFrontDivStyle ={
-    zIndex: '2',
-    position: 'absolute',
-    height: '50vh',
-    left: '0',
-    width: '50vw',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-}
-const RightBackDivStyle = {
-    backgroundImage: `url("${RightBackground}")`,
-    height: '50vh',
-    width: '50vw',
-    backgroundSize: 'cover',
-    opacity: '0.3',    
-    position: 'absolute',
-    zIndex: '1',
-    right: '0',
-}
-const RightFrontDivStyle ={
-    zIndex: '2',
-    position: 'absolute',
-    height: '50vh',
-    width: '50vw',
-    right: '0',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-}
+const LeftBackDivStyle = styled.div`
+    background-image: url("${LeftBackground}");
+    height: 50vh;
+    width: 50vw;
+    background-size: cover;
+    opacity: 0.5;
+    position: absolute;
+    left: 0;
+    z-index: 1;
+    @media screen and (max-width: ${MINWIDTH}px){
+        width: 100vw;
+        position: static;
+
+        }    
+`
+const LeftFrontDivStyle =styled.div`
+    z-index: 2;
+    position: absolute;
+    height: 50vh;
+    left: 0;
+    width: 50vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    @media screen and (max-width: ${MINWIDTH}px){
+        width: 100vw;
+
+
+
+        }      
+`
+const RightBackDivStyle = styled.div`
+    background-image: url("${RightBackground}");
+    height: 50vh;
+    width: 50vw;
+    background-size: cover;
+    opacity: 0.3;    
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    @media screen and (max-width: ${MINWIDTH}px){
+        width: 100vw;
+
+        }       
+`
+const RightFrontDivStyle = styled.div`
+    z-index: 2;
+    position: absolute;
+    height: 50vh;
+    width: 50vw;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    @media screen and (max-width: ${MINWIDTH}px){
+        width: 100vw;
+        position: relative;
+        top: -700px;
+
+        }      
+`
 
 const BottomButton = styled(Button)`
 
@@ -172,7 +215,7 @@ class HomePage extends React.Component{
 
         
         //delete me
-        // localStorage.setItem("id_token", 'eyJraWQiOiJNRGRoSlgrdmo5dlRYNklBXC9sc2o3ekFFVGdUNktQaFpaUkF2RW5xZmwyRT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoib21aSjUyRm5sVUVuMmxLTXVoLWJldyIsInN1YiI6IjBjMGFjMTA4LTIwNzUtNDFjYi1iOTYxLWE4YTZiZTcxOTRiOCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtd2VzdC0xLmFtYXpvbmF3cy5jb21cL3VzLXdlc3QtMV9qcmZqT1RaZmciLCJjb2duaXRvOnVzZXJuYW1lIjoiMGMwYWMxMDgtMjA3NS00MWNiLWI5NjEtYThhNmJlNzE5NGI4IiwiYXVkIjoiMTZrcjdsM2dkMnVocm84OXBmbmtrNzdhcGkiLCJldmVudF9pZCI6ImEwMmYwYzMyLWU1OGEtNDkwMy05ZGJlLWIwODEwYzRhMGJjMyIsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNjU5Mzk4NDc2LCJleHAiOjE2NTk0MDIwNzYsImlhdCI6MTY1OTM5ODQ3NiwianRpIjoiZjdlMDhmNDItMzIxYi00MjlmLTk3MjctMGZlMmUxMTFjYzk4IiwiZW1haWwiOiJ3YnJhZGZvcmQyMDAxQGdtYWlsLmNvbSJ9.kJAGfyvqxTyQGyzy2WPToCjWCa8q3LFy2herD03uLbs6xq4nR1uoi-udU7P8GUSB_RkUSS0TaQ5418hNzbP2S6YMcwjO8fPNNqUrR3aeBwf3DwILi-WyXJZJadRs1FzdDySbcKk2dTP35sjPiziQr6YvWtfdPd6mZBm3HJAvG6hUdrPF2acz2ZfkO446CjeGVl9WqIzpjX1tQf_ood8LtJWosgFIG8Au6_Ovp2FEHxedNBFuQw7JDFz1dV43yYiEbud1mJRSi7OUHZUC8MOeC6sPGzuHHvgOH4bjy9usa0bKDA0Wmkdp-TVmJMwVCUcXIf9j4GMj0iV-NRIL2_0dCw')
+        // localStorage.setItem("id_token", 'eyJraWQiOiJNRGRoSlgrdmo5dlRYNklBXC9sc2o3ekFFVGdUNktQaFpaUkF2RW5xZmwyRT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoiNm5ERkd2ZkRTTEUzZzFRci1RNjBYUSIsInN1YiI6IjBjMGFjMTA4LTIwNzUtNDFjYi1iOTYxLWE4YTZiZTcxOTRiOCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtd2VzdC0xLmFtYXpvbmF3cy5jb21cL3VzLXdlc3QtMV9qcmZqT1RaZmciLCJjb2duaXRvOnVzZXJuYW1lIjoiMGMwYWMxMDgtMjA3NS00MWNiLWI5NjEtYThhNmJlNzE5NGI4IiwiYXVkIjoiMTZrcjdsM2dkMnVocm84OXBmbmtrNzdhcGkiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTY1OTY2MTkyOCwiZXhwIjoxNjU5NjY1NTI4LCJpYXQiOjE2NTk2NjE5MjksImp0aSI6ImNmY2EwNjExLTA1ODMtNDNiMi04M2MxLTE4NDdhZTZmMzg3YSIsImVtYWlsIjoid2JyYWRmb3JkMjAwMUBnbWFpbC5jb20ifQ.ieSBAHLM-O5oJY36N7gqOvAt_uNmVCHhOqkmU5i4jvxMiIeviCP_lD8A0V5YoMz-gotSFPwdD95qsijYj_yj9fMF3gQMMx6F0bg5oSdHwKHcx_SB-7uPvZupAQsPHApyvnjv0rTN4lvfgvEEsdXcgpFRgfxUr0llroZ37pKnXBvjsmLdLvavh-2K8EQeLh0ePfO4C4UzXLoTr9e4UfjUcdbaJMJFJUD5yz1xsPIYhw9dxyztw18N9fkGtLK9F-SrpbH8kvbp3mPK8s1JgoJWVv6LPZFtpwXK-Cd9X1KtI96qoFJ1lQmfXN-CsDm7JMO-K1ak_CoGag-jN5wmLJ9S1g')
         
         if (localStorage.getItem("id_token")===null){
             this.setState({loggedIn: false})
@@ -279,17 +322,17 @@ class HomePage extends React.Component{
 
                 <BottomDiv>
 
-                    <div style={LeftBackDivStyle}>
-                    </div>
-                    <div style={LeftFrontDivStyle}>
+                    <LeftBackDivStyle >
+                    </LeftBackDivStyle>
+                    <LeftFrontDivStyle>
                             <BottomButton  href = {login_url}>Login</BottomButton>
-                    </div>                
+                    </LeftFrontDivStyle>                
 
-                    <div style={RightBackDivStyle}>
-                    </div>
-                    <div style={RightFrontDivStyle}>
+                    <RightBackDivStyle>
+                    </RightBackDivStyle>
+                    <RightFrontDivStyle>
                             <BottomButton  href = {'Edit'}>Create Split</BottomButton>
-                    </div>
+                    </RightFrontDivStyle>
                 </BottomDiv>
                
                 
@@ -312,10 +355,10 @@ class HomePage extends React.Component{
                 <Title variant="light">
                     Welcome, {this.state.email.split('@')[0]}!
                 </Title>
-                <div>
+                <DayContainer>
                     
                     {dayDisplays}
-                </div>
+                </DayContainer>
                 </StyledHomePage>)
         }
     

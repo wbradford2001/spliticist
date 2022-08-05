@@ -6,7 +6,7 @@ import {Alert} from 'react-bootstrap';
 
 const StyledDay = styled.div`
 border: 1px solid grey;
-background-color: rgb(245, 245, 255);
+background-color: rgb(100, 100, 100);
 margin: 2rem;
 border-radius: 1rem;
 padding: 1rem;
@@ -14,6 +14,9 @@ display: flex;
 align-items: center;
 font-size: 1.5rem;
 flex-flow: column;
+flex-grow: 1;
+min-width: 300px;
+max-width: 400px;
 `
 const DayBody = styled.div`
 

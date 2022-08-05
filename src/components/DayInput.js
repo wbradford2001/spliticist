@@ -1,7 +1,6 @@
-import { render } from '@testing-library/react'
 import React from 'react'
 import Exercise from '../components/Exercise'
-import {Form, Overlay, Popover} from 'react-bootstrap'
+import {Form, Overlay, Tooltip} from 'react-bootstrap'
 import styled from 'styled-components'
 
 
@@ -40,7 +39,7 @@ display: flex;
 align-items: center;
 `
 
-const StyledPopover = styled(Popover)`
+const StyledTooltip = styled(Tooltip)`
 
 `
 class DayInput extends React.Component{
@@ -135,11 +134,11 @@ class DayInput extends React.Component{
                             
 
                             >
-                            <StyledPopover id="popover-contained">
-                                <Popover.Body >
+                            <StyledTooltip >
+
                                 <strong>New Exercise</strong>
-                                </Popover.Body>
-                            </StyledPopover>
+
+                            </StyledTooltip>
                         </Overlay>
                 </StyledBody>
             </StyledForm>

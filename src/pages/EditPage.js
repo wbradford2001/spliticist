@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import AWS from 'aws-sdk'
 import DayInput from '../components/DayInput';
-import {Alert,Modal,Button, Popover, Overlay } from 'react-bootstrap'
+import {Alert,Modal,Button, Popover, Overlay, Tooltip } from 'react-bootstrap'
 import CustomSpinner from '../components/CustomSpinner'
 
 
@@ -38,8 +38,15 @@ margin-top: 5rem;
 const StyledOverlay = styled(Overlay)`
 margin: 0
 `
-const StyledPopover = styled(Popover)`
-margin: 0;
+const StyledTooltip = styled(Popover)`
+background: white;
+color: black;
+width: 20vw;
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 1.5rem;
+
 
 `
 function postSplit(email, split, lambdaObj, obj){
@@ -131,17 +138,19 @@ class EditPage extends React.Component {
     //     }
     // }
 
-            // localStorage.setItem("Split",'[{"Name":"Push","Exercises":[{"Name":"Bench"},{"Name":"Incline Bench"},{"Name":"Decline Bench"}]},{"Name":"Pull","Exercises":[{"Name":"Pull-ups"},{"Name":"Curls"},{"Name":"Rows"}]},{"Name":"Legs","Exercises":[{"Name":"Squat"}]}]')
+            //localStorage.setItem("Split",'[{"Name":"Push","Exercises":[{"Name":"Bench"},{"Name":"Incline Bench"},{"Name":"Decline Bench"}]},{"Name":"Pull","Exercises":[{"Name":"Pull-ups"},{"Name":"Curls"},{"Name":"Rows"}]},{"Name":"Legs","Exercises":[{"Name":"Squat"}]}]')
+            // localStorage.setItem("Split","[]")
             // localStorage.setItem("id_token",'eyJraWQiOiJNRGRoSlgrdmo5dlRYNklBXC9sc2o3ekFFVGdUNktQaFpaUkF2RW5xZmwyRT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoia21oTFJPNW9kNTdCZzEtVHRYMFBvdyIsInN1YiI6IjBjMGFjMTA4LTIwNzUtNDFjYi1iOTYxLWE4YTZiZTcxOTRiOCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtd2VzdC0xLmFtYXpvbmF3cy5jb21cL3VzLXdlc3QtMV9qcmZqT1RaZmciLCJjb2duaXRvOnVzZXJuYW1lIjoiMGMwYWMxMDgtMjA3NS00MWNiLWI5NjEtYThhNmJlNzE5NGI4IiwiYXVkIjoiMTZrcjdsM2dkMnVocm84OXBmbmtrNzdhcGkiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTY1OTU2MDE5NCwiZXhwIjoxNjU5NTYzNzk0LCJpYXQiOjE2NTk1NjAxOTQsImp0aSI6IjQ5OTBiNGI5LWUyYTEtNDkwNi1hZDgwLTNkODEzYmYyOGQxYSIsImVtYWlsIjoid2JyYWRmb3JkMjAwMUBnbWFpbC5jb20ifQ.h88D4D6ypfS5rRWDby8nKiuNy5Jx9wKXiU-Q3C8JGO6EojrE0InWFy6-1Sm86iDxZnWx5G7yJBIsD4p_n5lDKLsELzeyPk0_vWwjnI4zkBukw39YKa7i9aGNWD1oYnbhfUo2B6FUEaKJ71fU0hGINQ4tNe_H_qXsdZpretlDDCqp7Rj8_2vTqUmaKQq76e1xV58w9xTqvAQHftWjLuC7cD8HVLqm_zOd3crG9I6VmOogH583ju-R4cgFfHDxRjZOCc4DFCfWPxde0v7_riXuCMb91mpYo85YrkszB-IOa4G0SZI27iR-4FMhcrDVA-u3mwKnI6ZRTRmaJkdAZT3XSw')
-            const testerFunc = (elem)=> (elem==undefined)
-
-            if (this.state.JSONSplit.every(testerFunc)){
-              this.setState({showOverlay: true})
-              console.log("display overlay")
-            }            
+           
             if (localStorage.getItem("Split")!==null){
+              
                   const stringySplit = localStorage.getItem("Split")
+                  
                   const JSONState = (JSON.parse(stringySplit))
+                  if (JSONState.length==0){
+                    this.setState({showOverlay: true})
+                    
+                  }                   
                   this.setState({JSONSplit: JSONState})
                   const id_token = localStorage.getItem("id_token")
                 
@@ -155,7 +164,13 @@ class EditPage extends React.Component {
 
                       }                
                   }); 
+              } else {
+
+                  this.setState({showOverlay: true})
+
               }
+
+
         
           }
     saveChanges(){
@@ -186,7 +201,10 @@ class EditPage extends React.Component {
       "Exercises": [
       ]
       })
+      
       this.setState({JSONSplit: oldSplit,showOverlay: false})
+      console.log(this.state.JSONSplit)
+      
 
            
     }
@@ -195,6 +213,7 @@ class EditPage extends React.Component {
       
       delete oldSplit[day]
       this.setState({JSONSplit: oldSplit})
+      
 
 
 
@@ -245,6 +264,7 @@ class EditPage extends React.Component {
   </Modal>)
   }
     render() {
+      console.log(this.state.JSONSplit)
 
       const state = this.state.JSONSplit
 
@@ -279,7 +299,7 @@ class EditPage extends React.Component {
                   exercises={day["Exercises"]}
                   deleteExercise = {this.deleteExercise}
                   addExercise = {this.addExercise}
-                  first={index==0}
+                  first={(index==0)&&(this.state.JSONSplit.length==1)}
                   ></DayInput>)
               })}  
 
@@ -291,11 +311,10 @@ class EditPage extends React.Component {
                  
 
                 >
-                  <StyledPopover id="popover-contained">
-                    <Popover.Body >
-                      <strong>Click here to create a new Day</strong>
-                    </Popover.Body>
-                  </StyledPopover>
+
+                  <StyledTooltip>
+                    <strong>Add a new day</strong>
+                  </StyledTooltip>
                 </StyledOverlay>
               <SaveChanges variation = "primary" onClick={this.saveChanges}>Save Changes</SaveChanges>   
         </StyledEditPage>
