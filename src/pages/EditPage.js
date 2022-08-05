@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import AWS from 'aws-sdk'
 import DayInput from '../components/DayInput';
-import {Alert,Modal,Button, Popover, Overlay, Tooltip } from 'react-bootstrap'
+import {Alert,Modal,Button, Popover } from 'react-bootstrap'
 import CustomSpinner from '../components/CustomSpinner'
 
 
@@ -14,11 +14,20 @@ display: flex;
 flex-flow: column;
 align-items: center
 `
-
+const AbContainer = styled(Button)`
+border: 2px solid white;
+border-radius: 1rem;
+padding: 1rem;
+display: flex;
+justify-content: center;
+align-items: center;
+flex-flow: column;
+margin-top: 5rem;
+`
 const StyledAb = styled.div`
-font-size: 60px;
-color: grey;
-margin-top: 3rem;
+font-size: 40px;
+color: white;
+
 
 margin-left: auto;
 margin-right: auto;
@@ -35,20 +44,7 @@ opacity: 0.7;
 margin: 0rem;
 margin-top: 5rem;
 `
-const StyledOverlay = styled(Overlay)`
-margin: 0
-`
-const StyledTooltip = styled(Popover)`
-background: white;
-color: black;
-width: 20vw;
-display: flex;
-justify-content: center;
-align-items: center;
-font-size: 1.5rem;
 
-
-`
 function postSplit(email, split, lambdaObj, obj){
     obj.setState({popup: 'loading'})
     const packagedSplit = []
@@ -113,8 +109,7 @@ class EditPage extends React.Component {
       this.state = {
         JSONSplit: [],
         popup: null,
-        showSpinner: "false",
-        showOverlay: false
+        showSpinner: "false"
     };
     this.saveChanges = this.saveChanges.bind(this)
     this.handleTitleChange = this.handleTitleChange.bind(this)
@@ -123,13 +118,11 @@ class EditPage extends React.Component {
     this.deleteDay = this.deleteDay.bind(this)
     this.deleteExercise = this.deleteExercise.bind(this)
     this.addExercise = this.addExercise.bind(this)
-    this.mouseEnterAdd = this.mouseEnterAdd.bind(this)
-    this.mouseLeaveAdd = this.mouseLeaveAdd.bind(this)
     this.returnModal = this.returnModal.bind(this)
     this.hideModal=this.hideModal.bind(this)
 
 
-    this.addDayRef = React.createRef();
+
     }
     componentDidMount(){
       
@@ -147,10 +140,7 @@ class EditPage extends React.Component {
                   const stringySplit = localStorage.getItem("Split")
                   
                   const JSONState = (JSON.parse(stringySplit))
-                  if (JSONState.length==0){
-                    this.setState({showOverlay: true})
-                    
-                  }                   
+                  
                   this.setState({JSONSplit: JSONState})
                   const id_token = localStorage.getItem("id_token")
                 
@@ -164,11 +154,7 @@ class EditPage extends React.Component {
 
                       }                
                   }); 
-              } else {
-
-                  this.setState({showOverlay: true})
-
-              }
+              } 
 
 
         
@@ -202,7 +188,7 @@ class EditPage extends React.Component {
       ]
       })
       
-      this.setState({JSONSplit: oldSplit,showOverlay: false})
+      this.setState({JSONSplit: oldSplit})
       console.log(this.state.JSONSplit)
       
 
@@ -232,14 +218,7 @@ class EditPage extends React.Component {
       oldSplit[day]["Exercises"].push({"Name":"New Exercise"})
       this.setState({JSONSplit: oldSplit})      
     }
-    mouseEnterAdd(event){
-      document.body.style.cursor = 'pointer'
-
-  }
-  mouseLeaveAdd(event){
-      document.body.style.cursor = 'auto'
-
-  }       
+      
   hideModal(){
     this.setState({popup: null})
   }
@@ -299,24 +278,14 @@ class EditPage extends React.Component {
                   exercises={day["Exercises"]}
                   deleteExercise = {this.deleteExercise}
                   addExercise = {this.addExercise}
-                  first={(index==0)&&(this.state.JSONSplit.length==1)}
+                  
                   ></DayInput>)
               })}  
-
-              <StyledAb ref={this.addDayRef}onClick={this.addDay} onMouseEnter={this.mouseEnterAdd} onMouseLeave={this.mouseLeaveAdd}  className="material-symbols-outlined">add_box</StyledAb>
-                <StyledOverlay 
-                  show={this.state.showOverlay}
-                  target={this.addDayRef.current}
-                  placement="bottom"
-                 
-
-                >
-
-                  <StyledTooltip>
-                    <strong>Add a new day</strong>
-                  </StyledTooltip>
-                </StyledOverlay>
-              <SaveChanges variation = "primary" onClick={this.saveChanges}>Save Changes</SaveChanges>   
+              <AbContainer onClick={this.addDay} variant="success">
+                <StyledAb  className="material-symbols-outlined">add</StyledAb>
+                  <div>Create Day</div>
+              </AbContainer>
+                <SaveChanges variation = "primary" onClick={this.saveChanges}>Save Changes</SaveChanges>   
         </StyledEditPage>
       );
     }

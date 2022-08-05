@@ -1,7 +1,8 @@
 import React from 'react'
-import Exercise from '../components/Exercise'
-import {Form, Overlay, Tooltip} from 'react-bootstrap'
+import Exercise from './Exercise'
+import {Form, Button} from 'react-bootstrap'
 import styled from 'styled-components'
+
 
 
 const StyledForm = styled(Form)`
@@ -11,6 +12,7 @@ padding: 2rem;
 margin: 1rem;
 background-color: rgb(150, 150,150);
 width: 70%;
+
 `
 const StyledHeader=styled.div`
 display: flex;
@@ -23,12 +25,15 @@ display: flex;
 flex-flow: column;
 align-items: center;
 `
-
+const AbContainer = styled(Button)`
+font-size: 0.5rem;
+margin-top: 2rem;
+`
 
 const StyledAb = styled.div`
-margin: 1rem;
-color: green;
-font-size: 30px;
+margin: 0;
+color: white;
+font-size: 20px;
 
 `
 
@@ -39,15 +44,12 @@ display: flex;
 align-items: center;
 `
 
-const StyledTooltip = styled(Tooltip)`
 
-`
 class DayInput extends React.Component{
     constructor(props){
         super(props)
         this.state = {
-            title: this.props.title,
-            showOverlay: false
+            title: this.props.title
         }
         this.handleTitleChange = this.handleTitleChange.bind(this)
         this.handleExerciseChange = this.handleExerciseChange.bind(this)
@@ -59,20 +61,9 @@ class DayInput extends React.Component{
 
 
 
-        this.addExRef = React.createRef();
+
     }
-    componentDidMount(){
 
-        
-        if (this.props.first==true){
-
-            this.setState({showOverlay: true})
-        }
-
-        
-
-        
-    }
     handleTitleChange(event){
         this.setState({title: event.target.value})
         this.props.handleTitleChange(event.target.value,this.props.day)
@@ -89,7 +80,7 @@ class DayInput extends React.Component{
     addExercise(event){
         event.preventDefault();
         this.props.addExercise(this.props.day)
-        this.setState({showOverlay: false})
+
     }
     mouseEnterTrash(event){
         document.body.style.cursor = 'pointer'
@@ -125,21 +116,12 @@ class DayInput extends React.Component{
                             deleteExercise={this.deleteExercise}
                              ></Exercise>)
                     })}
+                        <AbContainer onClick={this.addExercise} variant="success">
+                            <StyledAb  className="material-symbols-outlined">add</StyledAb>
+                            <div>Add Exercise</div>
+                        </AbContainer>
 
-                        <StyledAb ref = {this.addExRef}onClick={this.addExercise} onMouseEnter={this.mouseEnterTrash} onMouseLeave={this.mouseLeaveTrash}  className="material-symbols-outlined">add_box</StyledAb>
-                        <Overlay 
-                            show={this.state.showOverlay}
-                            target={this.addExRef.current}
-                            placement="bottom"
-                            
-
-                            >
-                            <StyledTooltip >
-
-                                <strong>New Exercise</strong>
-
-                            </StyledTooltip>
-                        </Overlay>
+                       
                 </StyledBody>
             </StyledForm>
         )

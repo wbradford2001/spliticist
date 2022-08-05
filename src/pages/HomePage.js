@@ -135,7 +135,7 @@ const RightBackDivStyle = styled.div`
     right: 0;
     @media screen and (max-width: ${MINWIDTH}px){
         width: 100vw;
-
+        
         }       
 `
 const RightFrontDivStyle = styled.div`
@@ -150,7 +150,7 @@ const RightFrontDivStyle = styled.div`
     @media screen and (max-width: ${MINWIDTH}px){
         width: 100vw;
         position: relative;
-        top: -700px;
+        top: -400px;
 
         }      
 `
